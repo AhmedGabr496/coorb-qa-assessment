@@ -57,5 +57,4 @@
 | Task | Left out | Why |
 |---|---|---|
 | 1 | Every fee amount, load testing, full security testing, layout, accessibility and devices | The 12-case cap. These belong to developer unit tests, separate load and security tests, and design reviews. See section 1.4. |
-| 2 | Transfer Funds, Bill Pay, Request Loan, Update Contact Info | The shared demo database was reset during my session. My user was wiped and every page returned "An internal error has occurred" (see `task-2/evidence/Env_site_error_after_demo_data_reset.jpg`). |
-| 3 | Repeating the negative cases for every currency | They don't depend on the data file, so they run on the first iteration only. |
+| 2 | Repeating the negative cases for every currency | They don't depend on the data file, so they run on the first iteration only. |
