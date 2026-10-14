@@ -1,0 +1,50 @@
+[
+  {
+    "baseCurrency": "USD",
+    "expectedTargets": [
+      "EUR",
+      "GBP",
+      "AED",
+      "EGP"
+    ],
+    "checkCurrency": "EUR",
+    "minRate": 0.6,
+    "maxRate": 1.2
+  },
+  {
+    "baseCurrency": "EUR",
+    "expectedTargets": [
+      "USD",
+      "GBP",
+      "AED",
+      "EGP"
+    ],
+    "checkCurrency": "USD",
+    "minRate": 0.8,
+    "maxRate": 1.6
+  },
+  {
+    "baseCurrency": "GBP",
+    "expectedTargets": [
+      "USD",
+      "EUR",
+      "AED",
+      "EGP"
+    ],
+    "checkCurrency": "USD",
+    "minRate": 1.0,
+    "maxRate": 1.8
+  },
+  {
+    "baseCurrency": "AED",
+    "expectedTargets": [
+      "USD",
+      "EUR",
+      "GBP",
+      "EGP"
+    ],
+    "checkCurrency": "USD",
+    "minRate": 0.27,
+    "maxRate": 0.275
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "captured": "2026-10-14, logged in as test1 test2 (customer 16097), account 18339",
+  "request_sent_by_the_page": "GET /parabank/services_proxy/bank/accounts/18339/transactions/amount/100?timeout=30000",
+  "status": 200,
+  "body": [],
+  "same_call_with_other_formats": {
+    "/accounts/18339/transactions/amount/100": "[]",
+    "/accounts/18339/transactions/amount/100.00": "[]",
+    "/accounts/18339/transactions/amount/100.0": "[]"
+  },
+  "but_the_same_account_has_these_100.00_transactions (from /accounts/18339/transactions/month/All/type/All)": [21913, 22579, 22801, 23245, 23689, 24133, 24355],
+  "and_find_by_transaction_id_21913_in_the_UI_returns_it": "10-14-2026  Funds Transfer Sent  $100.00 (see Bug2_03 screenshot)",
+  "related_observation_not_verified_in_UI": "GET /accounts/18339/transactions/onDate/10-14-2026 also returned []"
+}

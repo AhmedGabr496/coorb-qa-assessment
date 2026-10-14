@@ -1,0 +1,36 @@
+{
+  "captured": "2026-10-14, logged in as test1 test2 (customer 16097)",
+  "GET /parabank/services_proxy/bank/accounts/18339": {
+    "status": 200,
+    "body": { "id": 18339, "customerId": 16097, "type": "CHECKING", "balance": -184.5 }
+  },
+  "GET /parabank/services_proxy/bank/accounts/18339/transactions/month/All/type/All": {
+    "status": 200,
+    "note": "7 debits of 100.00. No opening-deposit credit is listed.",
+    "body": [
+      { "id": 21913, "accountId": 18339, "type": "Debit", "date": 1791936000000, "amount": 100, "description": "Funds Transfer Sent" },
+      { "id": 22579, "accountId": 18339, "type": "Debit", "date": 1791936000000, "amount": 100, "description": "Funds Transfer Sent" },
+      { "id": 22801, "accountId": 18339, "type": "Debit", "date": 1791936000000, "amount": 100, "description": "Funds Transfer Sent" },
+      { "id": 23245, "accountId": 18339, "type": "Debit", "date": 1791936000000, "amount": 100, "description": "Funds Transfer Sent" },
+      { "id": 23689, "accountId": 18339, "type": "Debit", "date": 1791936000000, "amount": 100, "description": "Funds Transfer Sent" },
+      { "id": 24133, "accountId": 18339, "type": "Debit", "date": 1791936000000, "amount": 100, "description": "Funds Transfer Sent" },
+      { "id": 24355, "accountId": 18339, "type": "Debit", "date": 1791936000000, "amount": 100, "description": "Funds Transfer Sent" }
+    ]
+  },
+  "GET /parabank/services_proxy/bank/customers/16097/accounts": {
+    "status": 200,
+    "note": "Main account negative; 7 new accounts of 100.00 each. Total 515.50.",
+    "body": [
+      { "id": 18339, "type": "CHECKING", "balance": -184.5 },
+      { "id": 18672, "type": "SAVINGS", "balance": 100 },
+      { "id": 18894, "type": "SAVINGS", "balance": 100 },
+      { "id": 19005, "type": "SAVINGS", "balance": 100 },
+      { "id": 19227, "type": "CHECKING", "balance": 100 },
+      { "id": 19338, "type": "CHECKING", "balance": 100 },
+      { "id": 19560, "type": "SAVINGS", "balance": 100 },
+      { "id": 19782, "type": "CHECKING", "balance": 100 }
+    ]
+  },
+  "Open New Account page, 'From account' dropdown": ["18339", "18672", "18894", "19005", "19227", "19338", "19560", "19782"],
+  "note": "Account 18339 (balance -184.50, available 0.00) is still offered as a source for the 100.00 opening deposit."
+}

@@ -1,0 +1,224 @@
+{
+  "info": {
+    "_postman_id": "25c5397a-5941-4aa2-8f0b-2b56e0161660",
+    "name": "FX Rates - open.er-api",
+    "description": "Indicative FX rates before an international transfer. Run with the environment 'FX Rates - open.er-api' and the data file fx_base_currencies.json.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Get rates for base currency",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const base = pm.variables.get('baseCurrency');",
+              "const check = pm.variables.get('checkCurrency');",
+              "let targets = pm.variables.get('expectedTargets');            // a list from the data file",
+              "if (typeof targets === 'string') { targets = JSON.parse(targets); }",
+              "const maxMs = Number(pm.variables.get('maxResponseTimeMs'));",
+              "const body = pm.response.json();",
+              "",
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+              "",
+              "pm.test(`Response time is under ${maxMs} ms`, () => {",
+              "    pm.expect(pm.response.responseTime).to.be.below(maxMs);",
+              "});",
+              "",
+              "pm.test('Response matches the expected schema', () => {",
+              "    pm.response.to.have.jsonSchema({\"type\": \"object\", \"required\": [\"result\", \"base_code\", \"time_last_update_unix\", \"rates\"], \"properties\": {\"result\": {\"enum\": [\"success\"]}, \"base_code\": {\"type\": \"string\", \"pattern\": \"^[A-Z]{3}$\"}, \"time_last_update_unix\": {\"type\": \"integer\"}, \"rates\": {\"type\": \"object\", \"additionalProperties\": {\"type\": \"number\"}}}});",
+              "});",
+              "",
+              "pm.test(`Rates are for the requested base currency (${base})`, () => {",
+              "    pm.expect(body.base_code).to.eql(base);",
+              "});",
+              "",
+              "pm.test(`Target currencies are present with positive rates: ${targets.join(', ')}`, () => {",
+              "    targets.forEach(c => pm.expect(body.rates[c], c).to.be.a('number').and.above(0));",
+              "});",
+              "",
+              "pm.test(`${base} to ${check} is in a sensible range`, () => {",
+              "    pm.expect(body.rates[check]).to.be.within(Number(pm.variables.get('minRate')), Number(pm.variables.get('maxRate')));",
+              "});",
+              "",
+              "// Capture the rate the customer would see, for the cross-check request",
+              "pm.collectionVariables.set('capturedRate', body.rates[check]);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/latest/{{baseCurrency}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "latest",
+            "{{baseCurrency}}"
+          ]
+        },
+        "description": "Rates for {{baseCurrency}} from the data file. Captures the rate to {{checkCurrency}}."
+      }
+    },
+    {
+      "name": "2. Cross-check reverse rate",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const base = pm.variables.get('baseCurrency');",
+              "const captured = Number(pm.collectionVariables.get('capturedRate'));",
+              "const tolerance = Number(pm.variables.get('crossRateTolerancePct'));",
+              "const reverse = pm.response.json().rates[base];",
+              "",
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+              "",
+              "pm.test(`Reverse rate is 1 / captured rate (within ${tolerance}%)`, () => {",
+              "    pm.expect(Math.abs(captured * reverse - 1) * 100).to.be.at.most(tolerance);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/latest/{{checkCurrency}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "latest",
+            "{{checkCurrency}}"
+          ]
+        },
+        "description": "Rates for {{checkCurrency}}. Uses the captured rate to check the reverse rate."
+      }
+    },
+    {
+      "name": "Negative cases",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Negative cases don't depend on the data file, so they run on the first iteration only",
+              "if (pm.info.iteration > 0) { pm.execution.skipRequest(); }"
+            ]
+          }
+        }
+      ],
+      "item": [
+        {
+          "name": "N1. Unsupported currency code",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Actual behaviour: HTTP 200, even for an unsupported code', () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test('Body reports the error: result \"error\", error-type \"unsupported-code\", no rates', () => {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.result).to.eql('error');",
+                  "    pm.expect(body['error-type']).to.eql('unsupported-code');",
+                  "    pm.expect(body).to.not.have.property('rates');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/latest/{{unsupportedCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "latest",
+                "{{unsupportedCode}}"
+              ]
+            },
+            "description": "A well-formed but unsupported code."
+          }
+        },
+        {
+          "name": "N2. Malformed currency code",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const requested = pm.variables.get('malformedCode');",
+                  "",
+                  "pm.test('Actual behaviour: HTTP 200 and \"success\" for a 4-letter code', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.expect(pm.response.json().result).to.eql('success');",
+                  "});",
+                  "",
+                  "pm.test(`Actual behaviour: the code is cut to 3 letters and ${requested.slice(0, 3)} rates are returned`, () => {",
+                  "    pm.expect(pm.response.json().base_code).to.eql(requested.slice(0, 3));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/latest/{{malformedCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "latest",
+                "{{malformedCode}}"
+              ]
+            },
+            "description": "A 4-letter code."
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseCurrency",
+      "value": "USD"
+    },
+    {
+      "key": "expectedTargets",
+      "value": "[\"EUR\",\"GBP\",\"AED\"]"
+    },
+    {
+      "key": "checkCurrency",
+      "value": "EUR"
+    },
+    {
+      "key": "minRate",
+      "value": "0.6"
+    },
+    {
+      "key": "maxRate",
+      "value": "1.2"
+    },
+    {
+      "key": "capturedRate",
+      "value": ""
+    }
+  ]
+}

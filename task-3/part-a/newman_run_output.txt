@@ -1,0 +1,115 @@
+(node:68340) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+newman
+
+FX Rates - open.er-api
+
+Iteration 1/4
+
+→ 1. Get rates for base currency
+  GET https://open.er-api.com/v6/latest/USD [200 OK, 3.74kB, 545ms]
+  ✓  Status is 200
+  ✓  Response time is under 2000 ms
+  ✓  Response matches the expected schema
+  ✓  Rates are for the requested base currency (USD)
+  ✓  Target currencies are present with positive rates: EUR, GBP, AED, EGP
+  ✓  USD to EUR is in a sensible range
+
+→ 2. Cross-check reverse rate
+  GET https://open.er-api.com/v6/latest/EUR [200 OK, 3.81kB, 119ms]
+  ✓  Status is 200
+  ✓  Reverse rate is 1 / captured rate (within 0.5%)
+
+❏ Negative cases
+↳ N1. Unsupported currency code
+  GET https://open.er-api.com/v6/latest/XYZ [200 OK, 807B, 254ms]
+  ✓  Actual behaviour: HTTP 200, even for an unsupported code
+  ✓  Body reports the error: result "error", error-type "unsupported-code", no rates
+
+↳ N2. Malformed currency code
+  GET https://open.er-api.com/v6/latest/USDX [200 OK, 3.73kB, 421ms]
+  ✓  Actual behaviour: HTTP 200 and "success" for a 4-letter code
+  ✓  Actual behaviour: the code is cut to 3 letters and USD rates are returned
+
+Iteration 2/4
+
+→ 1. Get rates for base currency
+  GET https://open.er-api.com/v6/latest/EUR [200 OK, 3.82kB, 87ms]
+  ✓  Status is 200
+  ✓  Response time is under 2000 ms
+  ✓  Response matches the expected schema
+  ✓  Rates are for the requested base currency (EUR)
+  ✓  Target currencies are present with positive rates: USD, GBP, AED, EGP
+  ✓  EUR to USD is in a sensible range
+
+→ 2. Cross-check reverse rate
+  GET https://open.er-api.com/v6/latest/USD [200 OK, 3.73kB, 95ms]
+  ✓  Status is 200
+  ✓  Reverse rate is 1 / captured rate (within 0.5%)
+
+❏ Negative cases
+↳ N1. Unsupported currency code
+
+↳ N2. Malformed currency code
+
+Iteration 3/4
+
+→ 1. Get rates for base currency
+  GET https://open.er-api.com/v6/latest/GBP [200 OK, 3.81kB, 152ms]
+  ✓  Status is 200
+  ✓  Response time is under 2000 ms
+  ✓  Response matches the expected schema
+  ✓  Rates are for the requested base currency (GBP)
+  ✓  Target currencies are present with positive rates: USD, EUR, AED, EGP
+  ✓  GBP to USD is in a sensible range
+
+→ 2. Cross-check reverse rate
+  GET https://open.er-api.com/v6/latest/USD [200 OK, 3.73kB, 91ms]
+  ✓  Status is 200
+  ✓  Reverse rate is 1 / captured rate (within 0.5%)
+
+❏ Negative cases
+↳ N1. Unsupported currency code
+
+↳ N2. Malformed currency code
+
+Iteration 4/4
+
+→ 1. Get rates for base currency
+  GET https://open.er-api.com/v6/latest/AED [200 OK, 3.78kB, 79ms]
+  ✓  Status is 200
+  ✓  Response time is under 2000 ms
+  ✓  Response matches the expected schema
+  ✓  Rates are for the requested base currency (AED)
+  ✓  Target currencies are present with positive rates: USD, EUR, GBP, EGP
+  ✓  AED to USD is in a sensible range
+
+→ 2. Cross-check reverse rate
+  GET https://open.er-api.com/v6/latest/USD [200 OK, 3.73kB, 381ms]
+  ✓  Status is 200
+  ✓  Reverse rate is 1 / captured rate (within 0.5%)
+
+❏ Negative cases
+↳ N1. Unsupported currency code
+
+↳ N2. Malformed currency code
+
+┌─────────────────────────┬────────────────────┬────────────────────┐
+│                         │           executed │             failed │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│              iterations │                  4 │                  0 │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│                requests │                 10 │                  0 │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│            test-scripts │                 10 │                  0 │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│      prerequest-scripts │                  8 │                  0 │
+├─────────────────────────┼────────────────────┼────────────────────┤
+│              assertions │                 36 │                  0 │
+├─────────────────────────┴────────────────────┴────────────────────┤
+│ total run duration: 5.8s                                          │
+├───────────────────────────────────────────────────────────────────┤
+│ total data received: 26.99kB (approx)                             │
+├───────────────────────────────────────────────────────────────────┤
+│ average response time: 222ms [min: 79ms, max: 545ms, s.d.: 160ms] │
+└───────────────────────────────────────────────────────────────────┘
